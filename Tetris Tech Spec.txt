@@ -1,0 +1,441 @@
+Alexander J Miller 
+CIS 568, Spring 2014
+Tetris Tech Spec
+
+//------------------------------------------------------------GAME DESIGN:
+
+	Player Goals and Objectives:
+
+		-	Prevent falling tetrominos from stacking up to the top of the 
+			screen
+
+		-	Get as many points as possible
+
+		-	Fill entire rows with blocks when tower is too high.
+
+		-	Try to clear four rows at once
+
+		-	Arrange for four consecutive rows to each have a single empty 
+			space along the same column to make a Tetris possible.  I'll
+			call this a "Tetris Setup."
+
+	Challenges and Conflict:
+
+		-	Controlled piece is steadily lowered at a speed that increases
+			with each level, affording less and less time to manipulate
+			piece into favorable orientation/position.
+
+		-	It is safest to keep your tower height as low as possible, but
+			to get maximum points, you want a Tetris Setup, which is at 
+			least four blocks tall.
+
+		-	In most situations, there is at least one piece you would 
+			prefer to be generated over another.  Unfortunately, the next
+			piece is generated randomly.
+
+		-	Rows can be rendered unclearable by floating pieces left by
+			previous clears.
+
+	Constraints and Boundries:
+
+		-  	Pieces cannot pass through other pieces or the 10 X 20 block
+			play area.
+
+		-	Only the currently falling piece can be manipulated, and can
+			only be moved/rotated so fast/far.
+
+		-	Once a piece has become terrain, it can only be lowered by 
+			clearing a line below it, and it cannot be lowered beyond the 
+			cleared line(s).  This constraint leads to floating pieces.
+
+	Resources:
+
+		- 	There are no traditional resources in this game
+
+	Rules:
+
+		1.	The game will start by generating a falling tetromino at the 
+			top of a 10 X 20 block game space.  It will be lowered one 
+			block-width at a time until there is either a piece of terrain
+			or border below it.  When the falling piece cannot be lowered
+			anymore, it is added to the terrain and another is generated. 
+			This continues until a piece is generated that cannot be 
+			lowered a single block-width.  In this case, the player 
+			loses.
+
+		2.  If an entire row is filled with unit blocks from fallen 
+			tetrominos, that row is cleared.  Multiple rows can be cleared
+			simultaneously.  For each row that is cleared, all blocks 
+			above the cleared row(s) are lowered one block-width for each
+			row cleared.  Player receives points commensurate with the 
+			number of rows cleared.
+
+		3.	The player can manipulate the falling tetromino; the piece 
+			can be moved left, right, down, or rotated clockwise or 
+			counterclockwise.
+
+		4.  A piece cannot be moved or dropped through terrain or the 
+			game border.
+
+//------------------------------------------------------SCENE DESCRIPTION:
+
+	Intro:
+
+		- Description:
+
+			Displays game name and the Tetris building
+
+		- Game Object List:
+
+			1. Plane for background
+			2. Game Manager
+			3. Light
+			4. Camera
+
+		- Player Input Specification:
+
+			Enter 	-	Starts game
+
+	Level Select:
+
+		- Description:
+
+			Interface for selecting starting level and height.  Includes
+			a start button, a checkbox button for advanced mode, and two
+			sets of radio buttons that set starting level and height.
+
+		- Game Object List:
+
+			1. Plane for background
+			2. Game Manager
+			3. Light
+			4. Camera
+			3. GUI
+
+		- Player Input Specification:
+
+			Click Starts 	-	Starts a new game with level and height 
+								based on highlighted radio buttons.
+
+			Click Level 	-	Update the starting level for the next 
+								game to be played
+
+			Click height	-	Update the starting height for the next 
+								game to be played
+				  
+	Game:
+
+		- Description:
+
+			Levels 0 - 9 will each have a 10 x 20 block-wide boundary 
+			outside of which the player cannot move tetrominoes.  There 
+			is a unique background for each level.  In the upper right 
+			corner, the score, number of cleared lines, and next piece to 
+			be generated are all displayed.
+
+		- Game Object List:
+
+			1. Plane for background
+				- Text for score
+				- Text for lines
+				- Image for next piece
+			2. Game Manager
+			3. Light
+			4. Camera
+			5. Terrain
+				- N Cubes
+			6. Current Piece
+				- 4 Cubes
+
+		- Player Input Specification:
+
+			Arrow Buttons 	- 	Move current piece left or right
+
+			Space 			-	Drops current piece as far as it can go
+
+			A and D 		- 	Rotate current piece counter clockwise or 
+								clockwise
+
+			Return 			- 	Pauses the game
+
+	High Score:
+
+		- Description:
+			
+			Displays the best scores and the player names
+
+		- Game Object List:
+
+			1. Plane for background
+			2. Game Manager
+			3. Light
+			4. Camera
+			5. HighScores
+				-Texts for 
+
+		- Player Input Specification:
+
+//-----------------------------------------------------SCENE CONNECTIVITY:
+												
+														   
+	INTRO 	-> 	LEVEL SELECT 	->	GAME 	->	HIGH SCORE
+					/\								||
+					||								\/
+						<-	<-	<-	<-	<-	<-	<-
+
+//----------------------------------------------------OBJECT DESCRIPTIONS:
+
+	a. Asset List:
+
+		Game Objects
+
+			- AudioManager
+			- Background
+			- Backwards L Piece		
+			- Camera
+			- Game
+			- Game Manager
+			- L Piec
+			- Light
+			- Line Piece
+			- Lines Display
+			- Next Piece Display
+			- Score Display
+			- Square Piece
+			- Squig Right Piece		
+			- Squig Left Piece		
+			- T Piece		
+			- Terrain
+
+		Scripts:
+
+			- AudioManager
+			- Game
+			- GameManager
+			- FourStatePiece
+			- HighScoreList
+			- OneStatePiece
+			- Piece
+			- Singleton
+			- TwoStatePiece
+
+		Game:
+
+			- Empty Game Object
+			- Game Script
+				- Controls 
+
+		Textures:
+
+			- Backgrounds (one for each scene and levels 0 - 9)
+			- Block textures (one for each piece type)
+
+	b. Standard Components:
+
+		- Background
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- Background Textures
+
+		- Backwards L Piece		
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes
+			- Backwards L Piece Square Texture
+
+		- Camera
+			- Default Components
+
+		- Game
+			- Empty GameObject
+			- Prefabs of all Pieces 
+
+		- Game Manager
+			- Empty GameObject
+
+		- L Piece
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes			
+			- L Piece Square Texture		
+
+		- Light
+			- Default Components
+
+		- Line Piece
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes			
+			- Line Piece Square Texture
+
+		- Lines Display
+			- Text Mesh
+
+		- Next Piece Display
+			- Text Mesh		
+
+		- Score Display
+			- Text Mesh		
+
+		- Square Piece
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes			
+			- Square Square Texture
+
+		- Squig Right Piece		
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes			
+			- Squig Right Square Texture
+
+		- Squig Left Piece		
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes			
+			- Squig Left Square Texture
+
+		- T Piece		
+			- Mesh Collider
+			- Mesh Renderer
+			- Plane
+			- 4 Cubes			
+			- T Square Texture
+
+		- Terrain
+			- Terrain Script
+
+	c. Custom Components:
+
+		AudioManager : Singleton<AudioManager> : MonoBehavior
+
+			i. 	Data Members:
+
+			ii.	Methods:
+
+				public void playClearSound()
+				public void playRotateSound()
+				public void playMoveSound()								
+				public void playGameMusic()
+				public void pauseGameMusic()
+
+		FourStatePiece : MonoBehavior
+
+			i.	Data Members:	
+
+				None
+
+			ii. Methods:
+
+				public void rotateLeft()
+
+				public void rotateRight()
+
+		Game : Singleton<Game> : MonoBehavior
+
+			i.	Data Members:	
+
+				int score, lines, level, clock
+				bool isGameOver, isClearing
+
+			ii. Methods:
+
+				private void checkForKeyInput()
+
+					Checks for user input and, if necessary, calls methods to 
+					manipulate currentPiece or pause the game
+
+				private Piece generateNewPiece()
+
+					Randomly generates a new currentPiece
+
+				public void startNewGame()
+
+					Starts a new game at given level
+
+		GameManager : Singleton<Game> : MonoBehavior
+
+			i.	Data Members:	
+
+				HighScoreList highScores
+
+			ii. Methods:
+
+				loadHighScores()
+				saveHighScores()
+				switchScenes()
+
+		OneStatePiece : Piece : MonoBehavior
+
+			i.	Data Members:	
+
+				None
+
+			ii. Methods:		
+
+				rotateLeft()
+				rotateRight()
+
+		Piece : MonoBehavior
+
+			i.	Data Members:	
+
+			ii. Methods:		
+
+				public bool canMoveLeft()
+				public bool canMoveRight()
+				public bool canLower()
+				public bool canRotateLeft()
+				public bool canRotateRight()
+
+		Singleton<T> : MonoBehavior
+
+			i.	Data Members:
+
+				None
+
+			ii. Methods:		
+
+				get
+					Returns an instance of the object.  If no instance 
+					exists, it creates an empty GameObject and attaches 
+					itself to it and then returns the instance it just 
+					created.
+
+		TwoStatePiece : Piece : MonoBehavior
+
+			i.	Data Members:
+
+				bool isFlipped;
+
+			ii. Methods:		
+
+				rotateLeft()
+				rotateRight()
+
+//---------------------------------------------INTER-OBJECT COMMUNICATION:
+
+	Game Manager communicates with:
+		Game (through Singleton access)
+			- to reset game
+		Background (through Singleton access)
+			- to switch between scenes
+
+	Game communicates with:
+		Piece (through composition)
+			- to lower and manipulate
+		Terrain (through Singleton access)
+			- to add current piece to when it can no longer be lowered
+
+	Piece communicates with:
+		Terrain (through Singleton access)
+			- to know when it can move/rotate
+
+
