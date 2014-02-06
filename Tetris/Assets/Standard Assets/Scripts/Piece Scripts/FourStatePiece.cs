@@ -1,6 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
+/*
+ * This is for those Pieces that can be rotated on four sides, such as L, backwards 
+ * L, and the T piece.
+ */
+
 public class FourStatePiece : Piece {
 	
 //---------------------------------------------------------------------------FIELDS:
@@ -14,13 +19,13 @@ public class FourStatePiece : Piece {
  
 	override public void rotateLeft() 
 	{
-		rotate(90);
+		rotate(-90);
 	}
 	
 	
 	override public void rotateRight() 
 	{
-		rotate(-90);
+		rotate(90);
 	}
 	
 	private void rotate(int rotate)

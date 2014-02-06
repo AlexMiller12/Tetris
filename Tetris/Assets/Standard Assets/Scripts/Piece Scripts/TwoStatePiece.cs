@@ -1,6 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
+/*
+ * This is for those Pieces that can be rotated on two sides, such as the Squig, 
+ * Squig Left, and Line piece.
+ */
+
+
 public class TwoStatePiece : Piece {
 
 //---------------------------------------------------------------------------FIELDS:

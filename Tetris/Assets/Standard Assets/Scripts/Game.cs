@@ -6,7 +6,7 @@ public class Game : Singleton<Game> {
 	
 //---------------------------------------------------------------CONSTANTS & FIELDS:
 	
-	private const float CLEAR_TIME = 1.0f;
+	private const float CLEAR_TIME = 0.1f;
 	// Dimensions of grid
 	private const int WIDTH = 10, HEIGHT = 20; 
 	// Starting square for tetrominos (may need to be individualized)
@@ -42,17 +42,17 @@ public class Game : Singleton<Game> {
 				// Add blocks to terrain
 				Terrain.Instance.addPiece(currentPiece);		
 				// Check if any rows should be cleared
-				List<int> linesCleared = Terrain.Instance.checkForClears();
+				List<int> linesToClear = Terrain.Instance.checkForClears();
 				// Destroy blockless game piece
 				Destroy(currentPiece.gameObject);
 				
-				if (linesCleared.Count > 0)
+				if (linesToClear.Count > 0)
 				{
 					// Tell game that it's clearing a row and should wait
 					isClearing = true;	
 					Debug.Log("Game --- TODO: make lines blink!");
 					// Clear lines after done blinking
-					StartCoroutine(ClearAndLower(CLEAR_TIME, linesCleared));
+					StartCoroutine(ClearAndLower(CLEAR_TIME, linesToClear));
 				}
 				else
 				{
@@ -133,16 +133,21 @@ public class Game : Singleton<Game> {
 	 * Will wait for lines to blink before clearing given rows and lowering all
 	 * terrain overhead
 	 */
-	IEnumerator ClearAndLower (float waitTime, List<int> linesCleared)
+	IEnumerator ClearAndLower (float waitTime, List<int> linesToClear)
 	{
+		// Wait until blocks have finished playing clear animation
 		yield return new WaitForSeconds(waitTime);
-		// Destroy all blocks in given rows and lower the blocks above
 		
-		Debug.Log("Game --- waited for " + waitTime + " seconds!");
+		Debug.Log("Game --- waited for " + waitTime + " seconds!"); //TEMP
+		
+		Terrain.Instance.clearLines(linesToClear);
+		
+		//Terrain.Instance.lowerBlcoksAfterClear(linesToClear);
+		
 		currentPiece = generateNewPiece();
 		// If a piece can't lower even once, the tower's too high (game over!)
 		isGameOver = ! currentPiece.canLower();		
-		// It's OK to lower new piece
+		// It's OK to lower new piece now
 		isClearing = false;
 	}
 

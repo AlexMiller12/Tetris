@@ -37,7 +37,7 @@ public class Terrain : Singleton<Terrain> {
 	public List<int> checkForClears()
 	{
 		List<int> linesToClear = new List<int>();
-		for (int i = gridHeight - 1; i > 0; i--)
+		for (int i = 0; i < gridHeight; i++)
 		{
 			if (isGridRowFull(i))
 			{
@@ -57,18 +57,40 @@ public class Terrain : Singleton<Terrain> {
 		
 		foreach (Transform child in transform)
 		{
-			// Get the row of the block
-			int childRow = MyMath.castFloat(child.position.z);
-			if (rowNumbers.Contains(childRow))
+			// Get the col and row of the block
+			int col = MyMath.castFloat(child.position.x);
+			int row = MyMath.castFloat(child.position.z);
+			
+			// Put block on to-destroy list
+			if (rowNumbers.Contains(row))
 			{
+				// Old square is unoccupied unless something falls on it
+				occupied[col, row] = false;
 				blocksToDestroy.Add(child);
 			}
 		}
+		// Destroy all blocks
 		for (int i = 0; i < blocksToDestroy.Count; i++) 
 		{
-			blocksToDestroy[i].parent = null; //TODO or destroy?
+			Destroy(blocksToDestroy[i].gameObject);
 		}
-		Debug.Log("Terrain --- TODO: clearLines()");
+	}
+	
+	/*
+	 * Lowers all blocks above given rows one square for each cleared row 
+	 * beneath it
+	 */
+	private void lowerBlocksAfterClear(List<int> rowsCleared)
+	{
+		// TODO check for ascending order?
+		
+		foreach (int row in rowsCleared)
+		{
+			foreach (Transform block in transform)
+			{
+				int blockRow = 	MyMath.castFloat(block.position.z);
+			}
+		}
 	}
 	
 	/*
