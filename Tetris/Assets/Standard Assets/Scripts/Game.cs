@@ -6,10 +6,12 @@ public class Game : Singleton<Game> {
 	
 //---------------------------------------------------------------CONSTANTS & FIELDS:
 	
+	private const float CLEAR_TIME = 1.0f;
 	// Dimensions of grid
 	private const int WIDTH = 10, HEIGHT = 20; 
 	// Starting square for tetrominos (may need to be individualized)
 	private const int START_X = 5, START_Z = 18;
+	
 	
 	public GameObject Line, Back_L, Norm_L, Square, Squig_Left, Squig_Right, T;
 	
@@ -25,20 +27,37 @@ public class Game : Singleton<Game> {
 		startNewGame(0);
 	}
 	
+	/*
+	 * Main loop
+	 */
 	void FixedUpdate () 
 	{
-		//---TEMP:
+		//---TEMP: (should set fixed update based on level)
 		clock++;
 		if (clock % 40 == 0)
 		{
 		//---
-			if (! currentPiece.canLower()) 
+			if (! isClearing && ! currentPiece.canLower()) 
 			{
-				Terrain.Instance.addPiece(currentPiece);
-				Terrain.Instance.checkForClears();
-				currentPiece = generateNewPiece();
-				// If a piece can't lower even once, the tower's too high
-				isGameOver = ! currentPiece.canLower();
+				// Add blocks to terrain
+				Terrain.Instance.addPiece(currentPiece);		
+				// Check if any rows should be cleared
+				List<int> linesCleared = Terrain.Instance.checkForClears();
+				// Destroy blockless game piece
+				Destroy(currentPiece.gameObject);
+				
+				if (linesCleared.Count > 0)
+				{
+					// Tell game that it's clearing a row and should wait
+					isClearing = true;	
+					Debug.Log("Game --- TODO: make lines blink!");
+					// Clear lines after done blinking
+					StartCoroutine(ClearAndLower(CLEAR_TIME, linesCleared));
+				}
+				else
+				{
+					currentPiece = generateNewPiece();
+				}
 			}
 			else if (! isClearing)
 			{
@@ -69,7 +88,7 @@ public class Game : Singleton<Game> {
 	{
 		if (Input.GetKeyDown(KeyCode.Q))  //TODO TEMP!  JUST FOR DEBUGGING
 		{
-			Debug.Log("Game --- Break here!");
+			Debug.Log("Game --- Break here! ");
 		}
 		
 		if (Input.GetKeyDown(KeyCode.LeftArrow)) 
@@ -109,7 +128,24 @@ public class Game : Singleton<Game> {
 			Debug.Log("TODO: PAUSE");
 		}
 	}
+	
+	/*
+	 * Will wait for lines to blink before clearing given rows and lowering all
+	 * terrain overhead
+	 */
+	IEnumerator ClearAndLower (float waitTime, List<int> linesCleared)
+	{
+		yield return new WaitForSeconds(waitTime);
+		// Destroy all blocks in given rows and lower the blocks above
 		
+		Debug.Log("Game --- waited for " + waitTime + " seconds!");
+		currentPiece = generateNewPiece();
+		// If a piece can't lower even once, the tower's too high (game over!)
+		isGameOver = ! currentPiece.canLower();		
+		// It's OK to lower new piece
+		isClearing = false;
+	}
+
 	/*
 	 * Randomly generates a new currentPiece
 	 */

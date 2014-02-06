@@ -74,7 +74,7 @@ public abstract class Piece : MonoBehaviour {
 			{
 				return false;
 			}
-		}
+		} 
 		return true;
 	}
 	

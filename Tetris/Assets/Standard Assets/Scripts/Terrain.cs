@@ -7,17 +7,11 @@ public class Terrain : Singleton<Terrain> {
 
 //---------------------------------------------------------------------------FIELDS:
 	
-	private bool[,] occupied; 
+	private bool[,] occupied;
+	private int gridWidth, gridHeight;
 		
 //--------------------------------------------------------------------------METHODS:
-	IEnumerator ClearAndLower (float waitTime)
-	{
-		yield return new WaitForSeconds(waitTime);
-		Debug.Log("Game --- waited for " + waitTime + " seconds!");
-	}
-	
-	
-	
+ 	
    /*
 	* Adds the Piece to level terrain 
 	*/
@@ -35,33 +29,44 @@ public class Terrain : Singleton<Terrain> {
 			// Remove block from piece and add to terrain
 			child.parent = transform;
 		}
-
-		Destroy(piece.gameObject);
 	}
-	
+
 	/*
-	 * Clears all full rows.  Returns the number of lines cleared.
+	 * Clears all full rows.  Returns List of lines cleared.
 	 */
-	public int checkForClears()
+	public List<int> checkForClears()
 	{
-		// start at top, move down
-		// mark lines for clearing
-		// set Game.Instance.isClearing = true
-		// start coroutine to clear
-		//StartCoroutine(TryingACoroutine(5.0f));
-		Debug.Log("Terrain --- TODO: checkForClears()");
-		return -1;
+		List<int> linesToClear = new List<int>();
+		for (int i = gridHeight - 1; i > 0; i--)
+		{
+			if (isGridRowFull(i))
+			{
+				linesToClear.Add(i);
+			}
+		}		
+		return linesToClear;
 	}
 	
 	/*
 	 * Clears the given rows and lowers all blocks above one square for each row
 	 * cleared
 	 */
-	public void clearLines(params int[] rowNumbers)
+	public void clearLines(List<int> rowNumbers)
 	{
-		for (int i = 0; i < rowNumbers.Length; i++)
+		List<Transform> blocksToDestroy = new List<Transform>();
+		
+		foreach (Transform child in transform)
 		{
-				
+			// Get the row of the block
+			int childRow = MyMath.castFloat(child.position.z);
+			if (rowNumbers.Contains(childRow))
+			{
+				blocksToDestroy.Add(child);
+			}
+		}
+		for (int i = 0; i < blocksToDestroy.Count; i++) 
+		{
+			blocksToDestroy[i].parent = null; //TODO or destroy?
 		}
 		Debug.Log("Terrain --- TODO: clearLines()");
 	}
@@ -96,6 +101,23 @@ public class Terrain : Singleton<Terrain> {
 		
 		return isLegalAndFree(col, row);
 	}
+	
+	/*
+	 * Returns true if the entire row is filled with blocks
+	 */
+	private bool isGridRowFull(int row)
+	{
+		bool wtf = occupied[0, 0];
+
+		for (int i = 0; i < gridWidth; i++)
+		{
+			if (! occupied[i, row]) 
+			{
+				return false;	
+			}
+		}
+		return true;
+	}
 		
 	/*
 	 * Sets the occupied field to the given dimensions, initializes it to false,
@@ -103,6 +125,9 @@ public class Terrain : Singleton<Terrain> {
 	 */
 	public void resetGrid (int width, int height)
 	{
+
+		gridWidth = width;
+		gridHeight = height;
 		occupied = new bool[width, height];	
 	}
 
