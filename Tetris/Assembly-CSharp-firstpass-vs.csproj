@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Standard Assets\Scripts\Game.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General\MyMath.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General\Singleton.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Piece Scripts\FourStatePiece.cs" />

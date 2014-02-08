@@ -11,21 +11,16 @@ public class Game : Singleton<Game> {
 	private const int WIDTH = 10, HEIGHT = 20; 
 	// Starting square for tetrominos (may need to be individualized)
 	private const int START_X = 5, START_Z = 18;
-	
-	
+	// The current piece's fall speed is based on level, which indexes into array
+	private int[] ticksPerLower = {44, 39, 34, 29, 24, 20, 16, 12, 8, 5};
+	// level 5 = 20, 9 = 5
 	public GameObject Line, Back_L, Norm_L, Square, Squig_Left, Squig_Right, T;
 	
 	private Piece currentPiece, nextPiece;
 	private int clock, lines, level, score;
 	private bool isGameOver, isClearing;
-	
+ 
 //---------------------------------------------------------------------MONO METHODS:
-	
-	// TEMP
-	void Start () 
-	{
-		startNewGame(0);
-	}
 	
 	/*
 	 * Main loop
@@ -34,7 +29,7 @@ public class Game : Singleton<Game> {
 	{
 		//---TEMP: (should set fixed update based on level)
 		clock++;
-		if (clock % 20 == 0)
+		if (clock % ticksPerLower[level] == 0)
 		{
 		//---
 			if (! isClearing && ! currentPiece.canLower()) 
@@ -78,7 +73,7 @@ public class Game : Singleton<Game> {
 		checkForKeyInput();
 	}
 	
-//------------------------------------------------------------------------MY METHODS:
+//-----------------------------------------------------------------------MY METHODS:
 	
 	/*
 	 * Checks for user input and, if necessary, calls methods to manipulate 
@@ -200,13 +195,11 @@ public class Game : Singleton<Game> {
 								   spawnPoint, 
 								   Quaternion.identity) as GameObject;
 			
-			break;
-			
-			
+			break;	
 		}		
 		return newPiece.GetComponent<Piece>();
 	}
-	
+		
 	/*
 	 * Starts a new game at given level
 	 */
@@ -220,6 +213,5 @@ public class Game : Singleton<Game> {
 		lines = 0;
 		Terrain.Instance.resetGrid(WIDTH, HEIGHT);
 		currentPiece = generateNewPiece();
-	}
-	
+	}	
 }
