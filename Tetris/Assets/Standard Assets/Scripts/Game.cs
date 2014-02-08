@@ -88,7 +88,7 @@ public class Game : Singleton<Game> {
 	{
 		if (Input.GetKeyDown(KeyCode.Q))  //TODO TEMP!  JUST FOR DEBUGGING
 		{
-			Debug.Log("Game --- Break here! ");
+				Debug.Log("Game --- Break here! ");
 		}
 		
 		if (Input.GetKeyDown(KeyCode.LeftArrow)) 
@@ -141,8 +141,6 @@ public class Game : Singleton<Game> {
 		Debug.Log("Game --- waited for " + waitTime + " seconds!"); //TEMP
 		
 		Terrain.Instance.clearLines(linesToClear);
-		
-		//Terrain.Instance.lowerBlcoksAfterClear(linesToClear);
 		
 		currentPiece = generateNewPiece();
 		// If a piece can't lower even once, the tower's too high (game over!)

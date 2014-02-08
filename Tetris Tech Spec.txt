@@ -9,15 +9,16 @@ Tetris Tech Spec
 		-	Prevent falling tetrominos from stacking up to the top of the 
 			screen
 
+			-	Fill entire rows with blocks when tower is too high.
+
 		-	Get as many points as possible
 
-		-	Fill entire rows with blocks when tower is too high.
+			-	Try to clear four rows at once
 
-		-	Try to clear four rows at once
+			-	Arrange for four consecutive rows to each have a single empty 
+				space along the same column to make a Tetris possible.  I'll 
+				call this a "Tetris Setup."
 
-		-	Arrange for four consecutive rows to each have a single empty 
-			space along the same column to make a Tetris possible.  I'll
-			call this a "Tetris Setup."
 
 	Challenges and Conflict:
 
@@ -25,13 +26,13 @@ Tetris Tech Spec
 			with each level, affording less and less time to manipulate
 			piece into favorable orientation/position.
 
-		-	It is safest to keep your tower height as low as possible, but
-			to get maximum points, you want a Tetris Setup, which is at 
-			least four blocks tall.
-
 		-	In most situations, there is at least one piece you would 
 			prefer to be generated over another.  Unfortunately, the next
 			piece is generated randomly.
+
+		-	It is safest to keep your tower height as low as possible, but
+			to get maximum points, you want a Tetris Setup, which is at 
+			least four blocks tall.
 
 		-	Rows can be rendered unclearable by floating pieces left by
 			previous clears.
@@ -164,7 +165,7 @@ Tetris Tech Spec
 			
 			Displays the best scores and the player names
 
-		- Game Object List:
+ 		- Game Object List:
 
 			1. Plane for background
 			2. Game Manager
@@ -343,7 +344,7 @@ Tetris Tech Spec
 			i.	Data Members:	
 
 				int score, lines, level, clock
-				bool isGameOver, isClearing
+				bool isGAssignment 3.txtameOver, isClearing
 
 			ii. Methods:
 

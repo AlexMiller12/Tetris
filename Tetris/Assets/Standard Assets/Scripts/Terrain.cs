@@ -7,7 +7,7 @@ public class Terrain : Singleton<Terrain> {
 
 //---------------------------------------------------------------------------FIELDS:
 	
-	private bool[,] occupied;
+	private bool[,] occupied; //TODO private Transform[,] 
 	private int gridWidth, gridHeight;
 		
 //--------------------------------------------------------------------------METHODS:
@@ -74,6 +74,7 @@ public class Terrain : Singleton<Terrain> {
 		{
 			Destroy(blocksToDestroy[i].gameObject);
 		}
+		lowerBlocksAfterClear(rowNumbers);
 	}
 	
 	/*
@@ -84,11 +85,31 @@ public class Terrain : Singleton<Terrain> {
 	{
 		// TODO check for ascending order?
 		
-		foreach (int row in rowsCleared)
+		foreach (Transform block in transform)
 		{
-			foreach (Transform block in transform)
+			int blockRow = 	MyMath.castFloat(block.position.z);
+			int toLower = 0;
+			
+			foreach (int row in rowsCleared)
 			{
-				int blockRow = 	MyMath.castFloat(block.position.z);
+				if (blockRow > row)
+				{
+					toLower++;
+				}
+			}
+			if (toLower > 0)
+			{
+				int blockCol = MyMath.castFloat(block.position.x);
+				
+				if (occupied[blockCol, blockRow - toLower]) //TEMP
+				{
+					Debug.Log("Terrain --- SHIT! There's something there!");	
+				}
+				
+				occupied[blockCol, blockRow - toLower] = true;
+				occupied[blockCol, blockRow] = false;
+				
+				block.Translate(new Vector3(0, 0, -toLower), Space.World);
 			}
 		}
 	}
