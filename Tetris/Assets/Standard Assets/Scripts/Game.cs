@@ -34,7 +34,7 @@ public class Game : Singleton<Game> {
 	{
 		//---TEMP: (should set fixed update based on level)
 		clock++;
-		if (clock % 40 == 0)
+		if (clock % 20 == 0)
 		{
 		//---
 			if (! isClearing && ! currentPiece.canLower()) 
@@ -203,7 +203,7 @@ public class Game : Singleton<Game> {
 			break;
 			
 			
-		}
+		}		
 		return newPiece.GetComponent<Piece>();
 	}
 	

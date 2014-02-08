@@ -7,6 +7,7 @@ public class Terrain : Singleton<Terrain> {
 
 //---------------------------------------------------------------------------FIELDS:
 	
+	private Transform[,] blocks;
 	private bool[,] occupied; //TODO private Transform[,] 
 	private int gridWidth, gridHeight;
 		
@@ -22,10 +23,10 @@ public class Terrain : Singleton<Terrain> {
 			// Get the first child (cube)
 			Transform child = piece.transform.GetChild(0);
 			// Find grid location of block
-			int col = (int)(child.position.x + MyMath.EPSILON);
-			int row = (int)(child.position.z + MyMath.EPSILON);
+			int col = MyMath.castFloat(child.position.x);
+			int row = MyMath.castFloat(child.position.z);
 			// Mark as occupied on the grid
-			Terrain.Instance.occupied[col, row] = true;
+			Terrain.Instance.blocks[col, row] = child;
 			// Remove block from piece and add to terrain
 			child.parent = transform;
 		}
@@ -37,6 +38,7 @@ public class Terrain : Singleton<Terrain> {
 	public List<int> checkForClears()
 	{
 		List<int> linesToClear = new List<int>();
+		
 		for (int i = 0; i < gridHeight; i++)
 		{
 			if (isGridRowFull(i))
@@ -65,7 +67,7 @@ public class Terrain : Singleton<Terrain> {
 			if (rowNumbers.Contains(row))
 			{
 				// Old square is unoccupied unless something falls on it
-				occupied[col, row] = false;
+				blocks[col, row] = null;
 				blocksToDestroy.Add(child);
 			}
 		}
@@ -83,8 +85,6 @@ public class Terrain : Singleton<Terrain> {
 	 */
 	private void lowerBlocksAfterClear(List<int> rowsCleared)
 	{
-		// TODO check for ascending order?
-		
 		foreach (Transform block in transform)
 		{
 			int blockRow = 	MyMath.castFloat(block.position.z);
@@ -100,14 +100,9 @@ public class Terrain : Singleton<Terrain> {
 			if (toLower > 0)
 			{
 				int blockCol = MyMath.castFloat(block.position.x);
-				
-				if (occupied[blockCol, blockRow - toLower]) //TEMP
-				{
-					Debug.Log("Terrain --- SHIT! There's something there!");	
-				}
-				
-				occupied[blockCol, blockRow - toLower] = true;
-				occupied[blockCol, blockRow] = false;
+								
+				blocks[blockCol, blockRow - toLower] = block;
+				blocks[blockCol, blockRow] = null;
 				
 				block.Translate(new Vector3(0, 0, -toLower), Space.World);
 			}
@@ -123,7 +118,7 @@ public class Terrain : Singleton<Terrain> {
 		try
 		{
 			// If spot is unoccupied, spot is legal and free
-			return ! occupied[col, row];	
+			return blocks[col, row] == null;
 		}
 		catch (IndexOutOfRangeException e)
 		{
@@ -139,8 +134,8 @@ public class Terrain : Singleton<Terrain> {
 	public bool isLegalAndFree (Transform child)
 	{
 		// find grid location of block
-		int col = (int)(child.position.x + MyMath.EPSILON);
-		int row = (int)(child.position.z + MyMath.EPSILON);
+		int col = MyMath.castFloat(child.position.x);
+		int row = MyMath.castFloat(child.position.z);
 		
 		return isLegalAndFree(col, row);
 	}
@@ -150,11 +145,9 @@ public class Terrain : Singleton<Terrain> {
 	 */
 	private bool isGridRowFull(int row)
 	{
-		bool wtf = occupied[0, 0];
-
 		for (int i = 0; i < gridWidth; i++)
 		{
-			if (! occupied[i, row]) 
+			if (blocks[i, row] == null) 
 			{
 				return false;	
 			}
@@ -168,10 +161,10 @@ public class Terrain : Singleton<Terrain> {
 	 */
 	public void resetGrid (int width, int height)
 	{
-
 		gridWidth = width;
 		gridHeight = height;
 		occupied = new bool[width, height];	
+		blocks = new Transform[width, height];
 	}
 
 }
