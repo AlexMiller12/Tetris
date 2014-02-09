@@ -8,7 +8,6 @@ public class Terrain : Singleton<Terrain> {
 //---------------------------------------------------------------------------FIELDS:
 	
 	private Transform[,] blocks;
-	private bool[,] occupied; //TODO private Transform[,] 
 	private int gridWidth, gridHeight;
 		
 //--------------------------------------------------------------------------METHODS:
@@ -163,7 +162,6 @@ public class Terrain : Singleton<Terrain> {
 	{
 		gridWidth = width;
 		gridHeight = height;
-		occupied = new bool[width, height];	
 		blocks = new Transform[width, height];
 	}
 

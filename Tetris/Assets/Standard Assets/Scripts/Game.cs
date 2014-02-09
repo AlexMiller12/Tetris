@@ -6,11 +6,16 @@ public class Game : Singleton<Game> {
 	
 //---------------------------------------------------------------CONSTANTS & FIELDS:
 	
+	private const int LINES_PER_LEVEL = 1;
 	private const float CLEAR_TIME = 0.1f;
 	// Dimensions of grid
 	private const int WIDTH = 10, HEIGHT = 20; 
 	// Starting square for tetrominos (may need to be individualized)
 	private const int START_X = 5, START_Z = 18;
+	// Position at which next piece will be displayed
+	private Vector3 NEXT_PIECE_SPAWN = new Vector3(17, 0, 14);
+	// Position from which tetrominos will begin to fall
+	private Vector3 FALLING_PIECE_SPAWN = new Vector3(5, 0, 18);
 	// The current piece's fall speed is based on level, which indexes into array
 	private int[] ticksPerLower = {44, 39, 34, 29, 24, 20, 16, 12, 8, 5};
 	// level 5 = 20, 9 = 5
@@ -27,12 +32,10 @@ public class Game : Singleton<Game> {
 	 */
 	void FixedUpdate () 
 	{
-		//---TEMP: (should set fixed update based on level)
 		clock++;
 		if (clock % ticksPerLower[level] == 0)
 		{
-		//---
-			if (! isClearing && ! currentPiece.canLower()) 
+			if (! isClearing && ! currentPiece.canLower()) // Piece at bottom
 			{
 				// Add blocks to terrain
 				Terrain.Instance.addPiece(currentPiece);		
@@ -47,12 +50,12 @@ public class Game : Singleton<Game> {
 					isClearing = true;	
 					Debug.Log("Game --- TODO: make lines blink!");
 					// Clear lines after done blinking
-					StartCoroutine(ClearAndLower(CLEAR_TIME, linesToClear));
+					StartCoroutine( Clear(CLEAR_TIME, linesToClear) );
+					
 				}
-				else
-				{
-					currentPiece = generateNewPiece();
-				}
+				// Generate new next piece and start dropping old next
+				setCurrentPiece();
+	
 			}
 			else if (! isClearing)
 			{
@@ -64,7 +67,6 @@ public class Game : Singleton<Game> {
 				Debug.Log("Game Over!");
 			}
 		}
-	
 	}
 	
 	void Update()
@@ -74,6 +76,11 @@ public class Game : Singleton<Game> {
 	}
 	
 //-----------------------------------------------------------------------MY METHODS:
+	
+	private void addToScore(int numLinesCleared)
+	{
+		score += scoreLineClear(numLinesCleared);
+	}
 	
 	/*
 	 * Checks for user input and, if necessary, calls methods to manipulate 
@@ -126,30 +133,31 @@ public class Game : Singleton<Game> {
 	
 	/*
 	 * Will wait for lines to blink before clearing given rows and lowering all
-	 * terrain overhead
+	 * terrain overhead.  Updates game state
 	 */
-	IEnumerator ClearAndLower (float waitTime, List<int> linesToClear)
+	IEnumerator Clear (float waitTime, List<int> linesToClear)
 	{
 		// Wait until blocks have finished playing clear animation
 		yield return new WaitForSeconds(waitTime);
-		
-		Debug.Log("Game --- waited for " + waitTime + " seconds!"); //TEMP
-		
+
 		Terrain.Instance.clearLines(linesToClear);
-		
-		currentPiece = generateNewPiece();
-		// If a piece can't lower even once, the tower's too high (game over!)
-		isGameOver = ! currentPiece.canLower();		
 		// It's OK to lower new piece now
 		isClearing = false;
+				
+		int numLinesCleared = linesToClear.Count;
+		lines += numLinesCleared;
+		score += scoreLineClear(numLinesCleared);
+		
+		checkToIncreaseLevel();
+		
+		updateHUD();
 	}
 
 	/*
 	 * Randomly generates a new currentPiece
 	 */
-	private Piece generateNewPiece() 
+	private Piece generatePiece(ref Vector3 spawnPoint) 
 	{
-		Vector3 spawnPoint = new Vector3(START_X, 0, START_Z); 
 		GameObject newPiece;
 		
 		int pieceNumber = Random.Range(1, 7);
@@ -201,6 +209,28 @@ public class Game : Singleton<Game> {
 	}
 		
 	/*
+	 * Scores based on Nintendo version (minus points for soft drops, as we don't
+	 * allow soft drops here)
+	 * 
+	 */
+	private int scoreLineClear(int numLinesCleared)
+	{
+		switch (numLinesCleared)
+		{
+		case 1:
+			return 40 * (level + 1);
+		case 2:
+			return 100 * (level + 1);
+		case 3:
+			return 300 * (level + 1);
+		case 4:
+			return 1200 * (level + 1);
+		default:
+			return 0;
+		}
+	}
+	
+	/*
 	 * Starts a new game at given level
 	 */
 	public void startNewGame(int level)
@@ -212,6 +242,33 @@ public class Game : Singleton<Game> {
 		score = 0;
 		lines = 0;
 		Terrain.Instance.resetGrid(WIDTH, HEIGHT);
-		currentPiece = generateNewPiece();
+		currentPiece = generatePiece(ref FALLING_PIECE_SPAWN);
+		nextPiece = generatePiece(ref NEXT_PIECE_SPAWN);
 	}	
+	
+	private void setCurrentPiece()
+	{
+		currentPiece = nextPiece;
+		currentPiece.transform.position = FALLING_PIECE_SPAWN;
+		nextPiece = generatePiece(ref NEXT_PIECE_SPAWN);		
+	}
+	
+	private void updateHUD()
+	{
+		
+	}
+	
+	/*
+	 * Updates current level based on number of lines;
+	 */
+	private void checkToIncreaseLevel()
+	{
+		// Figure out when we need to increment level
+		int linesForNextLevel = (level + 1) * LINES_PER_LEVEL;
+		
+		if (lines == linesForNextLevel)
+		{
+			level++;	
+		}
+	}
 }

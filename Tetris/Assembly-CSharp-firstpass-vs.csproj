@@ -55,6 +55,7 @@
      <Compile Include="Assets\Standard Assets\Scripts\Piece Scripts\T.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Piece Scripts\TwoStatePiece.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Terrain.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\TetrisText.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
