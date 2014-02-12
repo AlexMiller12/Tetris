@@ -13,7 +13,7 @@ public class Game : Singleton<Game> {
 	// Starting square for tetrominos (may need to be individualized)
 	private const int START_X = 5, START_Z = 18;
 	// Position at which next piece will be displayed
-	private Vector3 NEXT_PIECE_SPAWN = new Vector3(17, 0, 14);
+	private Vector3 NEXT_PIECE_SPAWN = new Vector3(23, -5, 17);
 	// Position from which tetrominos will begin to fall
 	private Vector3 FALLING_PIECE_SPAWN = new Vector3(5, 0, 18);
 	// The current piece's fall speed is based on level, which indexes into array
@@ -55,6 +55,8 @@ public class Game : Singleton<Game> {
 				}
 				// Generate new next piece and start dropping old next
 				setCurrentPiece();
+						
+				isGameOver = ! currentPiece.canLower();
 	
 			}
 			else if (! isClearing)
@@ -63,8 +65,7 @@ public class Game : Singleton<Game> {
 			}		
 			if (isGameOver) 
 			{
-				//TODO disable game script and show high scores
-				Debug.Log("Game Over!");
+				endGame();
 			}
 		}
 	}
@@ -152,7 +153,14 @@ public class Game : Singleton<Game> {
 		
 		updateHUD();
 	}
-
+	
+	private void endGame()
+	{
+		Debug.Log("Game --- Game Over!");
+		// Disable this script so pieces stop falling
+		enabled = false;
+	}
+	
 	/*
 	 * Randomly generates a new currentPiece
 	 */
@@ -233,17 +241,19 @@ public class Game : Singleton<Game> {
 	/*
 	 * Starts a new game at given level
 	 */
-	public void startNewGame(int level)
+	public void startNewGame(int startLevel)
 	{
 		isGameOver = false;
 		isClearing = false;
-		this.level = level;
+		level = startLevel;
 		clock = 0;
 		score = 0;
 		lines = 0;
 		Terrain.Instance.resetGrid(WIDTH, HEIGHT);
 		currentPiece = generatePiece(ref FALLING_PIECE_SPAWN);
 		nextPiece = generatePiece(ref NEXT_PIECE_SPAWN);
+		
+		Background.Instance.level(startLevel);
 	}	
 	
 	private void setCurrentPiece()
@@ -255,7 +265,13 @@ public class Game : Singleton<Game> {
 	
 	private void updateHUD()
 	{
+		GameObject scoreObj = GameObject.Find("Score");
+		TextMesh scoreText = scoreObj.GetComponent<TextMesh>();
+		GameObject linesObj = GameObject.Find("Lines");
+		TextMesh linesText = linesObj.GetComponent<TextMesh>();
 		
+		scoreText.text = "" + score;
+		linesText.text = "" + lines;
 	}
 	
 	/*
@@ -268,7 +284,8 @@ public class Game : Singleton<Game> {
 		
 		if (lines == linesForNextLevel)
 		{
-			level++;	
+			level++;
+			Background.Instance.level(level);
 		}
 	}
 }

@@ -16,6 +16,27 @@ public abstract class Piece : MonoBehaviour {
 //--------------------------------------------------------------------------METHODS:
 
 	/*
+	 * Returns true if the piece can move down without going outside the boundary
+	 * or hitting another piece
+	 */
+	public bool canLower() 
+	{		
+		//Iterate through cube children, check grid below
+		foreach (Transform child in transform)
+		{
+			// find grid location of block
+			int col = MyMath.castFloat(child.position.x);
+			int row = MyMath.castFloat(child.position.z);
+			// check the row beneath it
+			if (! Terrain.Instance.isLegalAndFree(col, row - 1))
+			{
+				return false;
+			}
+		} 
+		return true;
+	}
+	
+	/*
 	 * Returns true if the piece can move left without going outside the boundary
 	 * or hitting another piece
 	 */
@@ -56,28 +77,7 @@ public abstract class Piece : MonoBehaviour {
 		}
 		return true;
 	}
-	
-	/*
-	 * Returns true if the piece can move down without going outside the boundary
-	 * or hitting another piece
-	 */
-	public bool canLower() 
-	{		
-		//Iterate through cube children, check grid below
-		foreach (Transform child in transform)
-		{
-			// find grid location of block
-			int col = (int)(child.position.x + MyMath.EPSILON);
-			int row = (int)(child.position.z + MyMath.EPSILON);
-			// check the row beneath it
-			if (! Terrain.Instance.isLegalAndFree(col, row - 1))
-			{
-				return false;
-			}
-		} 
-		return true;
-	}
-	
+		
 	/*
 	 * Returns true if the piece can rotate left without going outside the boundary
 	 * or hitting another piece
