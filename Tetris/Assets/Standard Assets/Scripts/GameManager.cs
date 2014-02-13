@@ -13,13 +13,24 @@ public class GameManager : MonoBehaviour {
 	
 //---------------------------------------------------------------------------FIELDS:
 	
-	
+	const float INTRO_DISPLAY_TIME = 2.0f;
 	
 //---------------------------------------------------------------------MONO METHODS:
-	
+
 	// Use this for initialization
 	void Start () {
-		Game.Instance.startNewGame(5);
+		
+		//-----TEMP
+		//Background.Instance.levelSelect();
+		//-----
+		
+		// Disable scripts
+		Game.Instance.enabled = false;
+		LevelSelector.Instance.enabled = false;
+		
+		// Switch to level select
+		StartCoroutine( GoToLevelSelect() );
+		
 	}
 	
 	// Update is called once per frame 
@@ -32,6 +43,16 @@ public class GameManager : MonoBehaviour {
 	public void startNewGame(int level)
 	{
 		
+	}
+	
+	IEnumerator GoToLevelSelect()
+	{
+		// Display intro for a second or two
+		yield return new WaitForSeconds(INTRO_DISPLAY_TIME);
+		// Switch Background
+		Background.Instance.levelSelect();
+		// Enable Level Selector
+		LevelSelector.Instance.enabled = true;
 	}
 	
 	/*

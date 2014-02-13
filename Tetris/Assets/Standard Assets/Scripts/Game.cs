@@ -168,7 +168,7 @@ public class Game : Singleton<Game> {
 	{
 		GameObject newPiece;
 		
-		int pieceNumber = Random.Range(1, 7);
+		int pieceNumber = Random.Range(1, 8);
 		
 		switch (pieceNumber)
 		{
@@ -206,12 +206,15 @@ public class Game : Singleton<Game> {
 								   Quaternion.identity) as GameObject;
 			break;
 			
-		default:
+		case 7:
 			newPiece = Instantiate(Line, 
 								   spawnPoint, 
 								   Quaternion.identity) as GameObject;
 			
 			break;	
+			
+		default:
+			return null;
 		}		
 		return newPiece.GetComponent<Piece>();
 	}
@@ -243,6 +246,7 @@ public class Game : Singleton<Game> {
 	 */
 	public void startNewGame(int startLevel)
 	{
+		enabled = true;
 		isGameOver = false;
 		isClearing = false;
 		level = startLevel;

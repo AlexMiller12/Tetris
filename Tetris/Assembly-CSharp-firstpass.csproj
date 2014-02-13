@@ -49,6 +49,7 @@
      <Compile Include="Assets\Standard Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General\MyMath.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General\Singleton.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\LevelSelector.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Piece Scripts\FourStatePiece.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Piece Scripts\Line.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Piece Scripts\OneStatePiece.cs" />
