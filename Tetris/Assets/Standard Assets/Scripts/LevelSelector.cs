@@ -2,14 +2,16 @@ using UnityEngine;
 using System.Collections;
 
 public class LevelSelector : Singleton<LevelSelector> {
-		
-//------------------------------------------------------------------------CONSTANTS:
-	
-	private const int BUTTON_WIDTH = 30, BUTTON_HEIGHT = 30;
-	
+
 //---------------------------------------------------------------------------FIELDS:
-		
+	
 	public GUISkin guiSkin;
+	
+	// The world-space coordinates at which the start and level buttons belong
+	private Vector3 startTL = new Vector3(-4.17f, -4.9f, 11.04f);
+	private Vector3 startBR = new Vector3(8.13f, -4.9f, 5.03f);
+	private Vector3 levelTL = new Vector3(-12.2f, -4.9f, 0.2f);
+	private Vector3 levelBR = new Vector3(-9.2f, -4.9f, -2.6f);
 	
 	// The textures used for clicked state for each button
 	public Texture2D start_clicked, lvl0_clicked, lvl1_clicked, lvl2_clicked, 
@@ -22,7 +24,7 @@ public class LevelSelector : Singleton<LevelSelector> {
 					 lvl7_unclicked, lvl8_unclicked, lvl9_unclicked;
 	
 	// The textures that are currently being displayed for each button
-	private Texture2D lvl0, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9;
+	private Texture2D lvl0, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9, start;
 	
 	private int startLevel = 0;
 	
@@ -35,112 +37,109 @@ public class LevelSelector : Singleton<LevelSelector> {
 	}
 	
 	void OnGUI()
-	{		
+	{	
+		
 		GUI.skin = guiSkin;
+				
+		Vector3 tl = MyCamera.Instance.camera.WorldToScreenPoint(levelTL);
+		Vector3 br = MyCamera.Instance.camera.WorldToScreenPoint(levelBR);
+		float width = br.x - tl.x;
+		float height = tl.y - br.y;
 		
-		int topX = 121;
-		int topY = 93;
-		
-		if (GUI.Button (buttonRect(topX, topY), lvl0))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl0))
 		{
 			Debug.Log("LevelSelector --- CLICKED!");
 			unclickAllButtons();
 			lvl0 = lvl0_clicked;
-			// Screen.width, Screen.height
 			startLevel = 0;
 		}
-		topX += BUTTON_WIDTH; 
-		
-		if (GUI.Button (buttonRect(topX, topY), lvl1))
+		tl.x += width;
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl1))
 		{
 			unclickAllButtons();	
 			lvl1 = lvl1_clicked;
 			startLevel = 1;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl2))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl2))
 		{
 			unclickAllButtons();	
 			lvl2 = lvl2_clicked;
 			startLevel = 2;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl3))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl3))
 		{
 			unclickAllButtons();	
 			lvl3 = lvl3_clicked;
 			startLevel = 3;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl4))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl4))
 		{
 			unclickAllButtons();	
 			lvl4 = lvl4_clicked;
 			startLevel = 4;
 		}
-		topX -= BUTTON_WIDTH * 4; 
-		topY += BUTTON_HEIGHT;
+		tl.x -= width * 4; 
+		tl.y += height;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl5))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl5))
 		{
 			unclickAllButtons();	
 			lvl5 = lvl5_clicked;
 			startLevel = 5;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl6))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl6))
 		{
 			unclickAllButtons();	
 			lvl6 = lvl6_clicked;
 			startLevel = 6;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl7))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl7))
 		{
 			unclickAllButtons();	
 			lvl7 = lvl7_clicked;
 			startLevel = 7;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl8))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl8))
 		{
 			unclickAllButtons();	
 			lvl8 = lvl8_clicked;
 			startLevel = 8;
 		}
-		topX += BUTTON_WIDTH; 
+		tl.x += width;
 		
-		if (GUI.Button (buttonRect(topX, topY), lvl9))
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl9))
 		{
 			unclickAllButtons();	
 			lvl9 = lvl9_clicked;
 			startLevel = 9;
 		}	 	
-		
-		if (GUI.Button (new Rect(200, 210, 120, 65), start_unclicked))
+
+		tl = MyCamera.Instance.camera.WorldToScreenPoint(startTL);
+		br = MyCamera.Instance.camera.WorldToScreenPoint(startBR);
+		width = br.x - tl.x;
+		height = tl.y - br.y;
+
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), start))
 		{
-			start_unclicked = start_clicked;
+			start = start_clicked;
 			StartCoroutine( StartGame() ) ;
-			Debug.Log("LevelSelector --- START CLICKED!");
 		}
 
 	}
 	
 //-----------------------------------------------------------------------MY METHODS:
-	
-	/*
-	 * Returns a Rect BUTTON_WIDTH tall and wide at topLeftX, topLeftY
-	 */
-	private Rect buttonRect(int topLeftX, int topLeftY)
-	{
-		return new Rect(topLeftX, topLeftY, BUTTON_HEIGHT, BUTTON_WIDTH);
-	}
 	
 	/*
 	 * Sets all levels to unclicked states
@@ -157,12 +156,18 @@ public class LevelSelector : Singleton<LevelSelector> {
 		lvl7 = lvl7_unclicked;
 		lvl8 = lvl8_unclicked;
 		lvl9 = lvl9_unclicked;
+		start = start_unclicked;
 	}
 
 	IEnumerator StartGame()
 	{
+		// Wait a sec so we can see the start button clicked
 		yield return new WaitForSeconds(0.3f);
+		// Start a new game
 		Game.Instance.startNewGame(startLevel);
-		enabled = false;
+		// Unclick the buttons so they're ready when we get back
+		unclickAllButtons();
+		// Disable so buttons disappear
+		enabled = false; 
 	}
 }

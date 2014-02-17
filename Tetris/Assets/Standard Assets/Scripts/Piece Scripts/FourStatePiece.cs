@@ -19,13 +19,13 @@ public class FourStatePiece : Piece {
  
 	override public void rotateLeft() 
 	{
-		rotate(90);
+		rotate(-90);
 	}
 	
 	
 	override public void rotateRight() 
 	{
-		rotate(-90);
+		rotate(90);
 	}
 	
 	private void rotate(int rotate)

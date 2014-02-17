@@ -22,13 +22,15 @@ public class Terrain : Singleton<Terrain> {
 			// Get the first child (cube)
 			Transform child = piece.transform.GetChild(0);
 			// Find grid location of block
-			int col = MyMath.castFloat(child.position.x);
-			int row = MyMath.castFloat(child.position.z);
+			int col = Mathf.RoundToInt(child.position.x);
+			int row = Mathf.RoundToInt(child.position.z);
 			// Mark as occupied on the grid
-			Terrain.Instance.blocks[col, row] = child;
+			blocks[col, row] = child;
 			// Remove block from piece and add to terrain
 			child.parent = transform;
 		}
+		// Destroy blockless game piece
+		Destroy(piece.gameObject);
 	}
 
 	/*
@@ -55,12 +57,12 @@ public class Terrain : Singleton<Terrain> {
 	public void clearLines(List<int> rowNumbers)
 	{
 		List<Transform> blocksToDestroy = new List<Transform>();
-		
+
 		foreach (Transform child in transform)
 		{
 			// Get the col and row of the block
-			int col = MyMath.castFloat(child.position.x);
-			int row = MyMath.castFloat(child.position.z);
+			int col = Mathf.RoundToInt(child.position.x);
+			int row = Mathf.RoundToInt(child.position.z);
 			
 			// Put block on to-destroy list
 			if (rowNumbers.Contains(row))
@@ -69,6 +71,10 @@ public class Terrain : Singleton<Terrain> {
 				blocks[col, row] = null;
 				blocksToDestroy.Add(child);
 			}
+		}
+		if (blocksToDestroy.Count != rowNumbers.Count * 10) //TEMP
+		{
+			Debug.Log("Terrain --- ERROR 3");
 		}
 		// Destroy all blocks
 		for (int i = 0; i < blocksToDestroy.Count; i++) 
@@ -79,14 +85,33 @@ public class Terrain : Singleton<Terrain> {
 	}
 	
 	/*
+	 * Destroys all blocks in terrain
+	 */
+	public void clearTerrain()
+	{
+		for (int i = 0; i < gridWidth; i++)
+		{
+			for (int j = 0; j < gridHeight; j++)
+			{
+				Transform block = blocks[i, j];
+				if (block != null)
+				{
+					GameObject.Destroy(block.gameObject);
+				}
+			}
+		}
+	}
+	
+	/*
 	 * Lowers all blocks above given rows one square for each cleared row 
 	 * beneath it
 	 */
 	private void lowerBlocksAfterClear(List<int> rowsCleared)
 	{
+		// Physically lower all blocks
 		foreach (Transform block in transform)
 		{
-			int blockRow = 	MyMath.castFloat(block.position.z);
+			int blockRow = 	Mathf.RoundToInt(block.position.z);
 			int toLower = 0;
 			
 			foreach (int row in rowsCleared)
@@ -97,15 +122,12 @@ public class Terrain : Singleton<Terrain> {
 				}
 			}
 			if (toLower > 0)
-			{
-				int blockCol = MyMath.castFloat(block.position.x);
-								
-				blocks[blockCol, blockRow - toLower] = block;
-				blocks[blockCol, blockRow] = null;
-				
+			{		
 				block.Translate(new Vector3(0, 0, -toLower), Space.World);
 			}
 		}
+		// Update grid
+		resetGrid (gridWidth, gridHeight);
 	}
 	
 	/*
@@ -133,8 +155,8 @@ public class Terrain : Singleton<Terrain> {
 	public bool isLegalAndFree (Transform child)
 	{
 		// find grid location of block
-		int col = MyMath.castFloat(child.position.x);
-		int row = MyMath.castFloat(child.position.z);
+		int col = Mathf.RoundToInt(child.position.x);
+		int row = Mathf.RoundToInt(child.position.z);
 		
 		return isLegalAndFree(col, row);
 	}
@@ -163,6 +185,22 @@ public class Terrain : Singleton<Terrain> {
 		gridWidth = width;
 		gridHeight = height;
 		blocks = new Transform[width, height];
+		
+		// Populate it with fallen blocks (if they exist)
+		foreach (Transform block in transform)
+		{
+			// Get the col and row of the block
+			int col = Mathf.RoundToInt(block.position.x);
+			int row = Mathf.RoundToInt(block.position.z);
+			try
+			{
+				blocks[col, row] = block;
+			}
+			catch (Exception e)
+			{
+				Debug.Log("col, row " + col + ", " + row + " is no good!");	
+			}
+		}
 	}
 
 }

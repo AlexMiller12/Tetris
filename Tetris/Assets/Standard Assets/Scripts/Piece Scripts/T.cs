@@ -8,7 +8,7 @@ public class T : Piece {
 	
 	
 //--------------------------------------------------------------------------METHODS:
-	
+	 
 	override public void init()
 	{
 		;	
@@ -34,5 +34,4 @@ public class T : Piece {
 		// Move back into grid
 		transform.Translate(new Vector3(0, -1, 0), Space.World);		
 	}
-	
 }

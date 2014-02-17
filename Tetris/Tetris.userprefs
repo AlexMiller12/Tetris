@@ -1,13 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Standard Assets/Scripts/Game.cs">
-    <Files>
-      <File FileName="Assets/Standard Assets/Scripts/Game.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/Scripts/Terrain.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/Scripts/GameManager.cs" Line="18" Column="15" />
-      <File FileName="Assets/Standard Assets/Scripts/Background.cs" Line="1" Column="1" />
-      <File FileName="Assets/Standard Assets/Scripts/LevelSelector.cs" Line="22" Column="4" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>Terrain.Instance.blocks</Value>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

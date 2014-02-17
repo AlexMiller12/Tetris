@@ -25,8 +25,8 @@ public abstract class Piece : MonoBehaviour {
 		foreach (Transform child in transform)
 		{
 			// find grid location of block
-			int col = MyMath.castFloat(child.position.x);
-			int row = MyMath.castFloat(child.position.z);
+			int col = Mathf.RoundToInt(child.position.x);
+			int row = Mathf.RoundToInt(child.position.z);
 			// check the row beneath it
 			if (! Terrain.Instance.isLegalAndFree(col, row - 1))
 			{
@@ -46,8 +46,8 @@ public abstract class Piece : MonoBehaviour {
 		foreach (Transform child in transform)
 		{
 			// find grid location of block
-			int col = (int)(child.position.x + MyMath.EPSILON);
-			int row = (int)(child.position.z + MyMath.EPSILON);		
+			int col = Mathf.RoundToInt(child.position.x);
+			int row = Mathf.RoundToInt(child.position.z);		
 			// check the col to the left
 			if (! Terrain.Instance.isLegalAndFree(col - 1, row))
 			{
@@ -67,8 +67,8 @@ public abstract class Piece : MonoBehaviour {
 		foreach (Transform child in transform)
 		{
 			// find grid location of block
-			int col = (int)(child.position.x + MyMath.EPSILON);
-			int row = (int)(child.position.z + MyMath.EPSILON);
+			int col = Mathf.RoundToInt(child.position.x);
+			int row = Mathf.RoundToInt(child.position.z);
 			// check the col to the right
 			if (! Terrain.Instance.isLegalAndFree(col + 1, row))
 			{
@@ -154,9 +154,15 @@ public abstract class Piece : MonoBehaviour {
 	 * Lowers the piece until it cannot be lowered anymore
 	 */
 	public void quickDrop()
-	{
+	{		
+		int i = 0;
 		while (canLower())
 		{
+			if (i > 1000){
+				Debug.Log("AHHHHHHHH");
+				break;	
+			}
+		
 			lower();
 		}
 	}
@@ -169,4 +175,18 @@ public abstract class Piece : MonoBehaviour {
 	
 	public abstract void rotateRight();
 	
+	
+	private void printBlockPositions()
+	{
+		Debug.Log("num children: " + transform.GetChildCount());
+		foreach (Transform child in transform)
+		{
+			
+			// find grid location of block
+			float col = child.position.x;
+			float row = child.position.z;
+			Debug.Log(col + ", " + row);
+		}	
+		Debug.Log("------------------");
+	}
 }
