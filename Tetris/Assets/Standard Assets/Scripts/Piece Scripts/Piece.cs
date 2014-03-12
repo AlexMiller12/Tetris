@@ -4,7 +4,7 @@ using System.Collections;
 public abstract class Piece : MonoBehaviour {
 	
 //---------------------------------------------------------------------------FIELDS:
-	
+
 	
 //---------------------------------------------------------------------MONO METHODS:
 	
@@ -21,6 +21,7 @@ public abstract class Piece : MonoBehaviour {
 	 */
 	public bool canLower() 
 	{		
+		Terrain.Instance.resetGrid(10, 20); //TEMP! TODO: find that bug or get rid of the stupid grid
 		//Iterate through cube children, check grid below
 		foreach (Transform child in transform)
 		{
@@ -37,47 +38,26 @@ public abstract class Piece : MonoBehaviour {
 	}
 	
 	/*
-	 * Returns true if the piece can move left without going outside the boundary
+	 * Returns true if the piece can move without going outside the boundary
 	 * or hitting another piece
 	 */
-	public bool canMoveLeft()
+	public bool canMove(int xMovement)
 	{
 		//Iterate through cube children, check grid below
 		foreach (Transform child in transform)
 		{
 			// find grid location of block
-			int col = Mathf.RoundToInt(child.position.x);
+			int col = Mathf.RoundToInt(child.position.x) + xMovement;
 			int row = Mathf.RoundToInt(child.position.z);		
 			// check the col to the left
-			if (! Terrain.Instance.isLegalAndFree(col - 1, row))
+			if (! Terrain.Instance.isLegalAndFree(col, row))
 			{
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	/*
-	 * Returns true if the piece can move right without going outside the boundary
-	 * or hitting another piece
-	 */
-	public bool canMoveRight()
-	{
-		//Iterate through cube children, check grid below
-		foreach (Transform child in transform)
-		{
-			// find grid location of block
-			int col = Mathf.RoundToInt(child.position.x);
-			int row = Mathf.RoundToInt(child.position.z);
-			// check the col to the right
-			if (! Terrain.Instance.isLegalAndFree(col + 1, row))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-		
+			
 	/*
 	 * Returns true if the piece can rotate left without going outside the boundary
 	 * or hitting another piece
@@ -131,6 +111,10 @@ public abstract class Piece : MonoBehaviour {
 	 */
 	public void lower() 
 	{
+		if (Terrain.Instance.willFallOnGoldBlock(this))
+		{
+			Terrain.Instance.mergeWithGoldBlock(this);	
+		}
 		transform.Translate(new Vector3(0, 0, -1), Space.World);
 	}
 	
@@ -139,6 +123,10 @@ public abstract class Piece : MonoBehaviour {
 	 */
 	public void moveLeft() 
 	{
+		if (Terrain.Instance.willMoveIntoGoldBlock(this, -1))
+		{
+			Terrain.Instance.mergeWithGoldBlock(this);	
+		}
 		transform.Translate(new Vector3(-1, 0, 0), Space.World);
 	}
 	
@@ -147,6 +135,10 @@ public abstract class Piece : MonoBehaviour {
 	 */
 	public void moveRight() 
 	{
+		if (Terrain.Instance.willMoveIntoGoldBlock(this, 1))
+		{
+			Terrain.Instance.mergeWithGoldBlock(this);	
+		}
 		transform.Translate(new Vector3(1, 0, 0), Space.World);
 	}
 	
@@ -155,14 +147,8 @@ public abstract class Piece : MonoBehaviour {
 	 */
 	public void quickDrop()
 	{		
-		int i = 0;
 		while (canLower())
 		{
-			if (i > 1000){
-				Debug.Log("AHHHHHHHH");
-				break;	
-			}
-		
 			lower();
 		}
 	}

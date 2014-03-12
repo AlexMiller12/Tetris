@@ -12,43 +12,48 @@ public class LevelSelector : Singleton<LevelSelector> {
 	private Vector3 startBR = new Vector3(8.13f, -4.9f, 5.03f);
 	private Vector3 levelTL = new Vector3(-12.2f, -4.9f, 0.2f);
 	private Vector3 levelBR = new Vector3(-9.2f, -4.9f, -2.6f);
+	private Vector3 advancedTL = new Vector3(5.63f, -4.9f, 2.2f);
+	private Vector3 advancedBR = new Vector3(8.43f, -4.9f, 0f);
 	
 	// The textures used for clicked state for each button
 	public Texture2D start_clicked, lvl0_clicked, lvl1_clicked, lvl2_clicked, 
 					 lvl3_clicked, lvl4_clicked, lvl5_clicked, lvl6_clicked, 
-					 lvl7_clicked, lvl8_clicked, lvl9_clicked;
+					 lvl7_clicked, lvl8_clicked, lvl9_clicked, advanced_clicked;
 	
 	// The textures used for unclicked state for each button
 	public Texture2D start_unclicked, lvl0_unclicked, lvl1_unclicked, lvl2_unclicked, 
 					 lvl3_unclicked, lvl4_unclicked, lvl5_unclicked, lvl6_unclicked, 
-					 lvl7_unclicked, lvl8_unclicked, lvl9_unclicked;
+					 lvl7_unclicked, lvl8_unclicked, lvl9_unclicked, advanced_unclicked;
 	
 	// The textures that are currently being displayed for each button
-	private Texture2D lvl0, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9, start;
+	private Texture2D lvl0, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9, 
+					  start, advanced;
 	
-	private int startLevel = 0;
+	private int startLevel;
+	private bool advancedMode;
 	
 //---------------------------------------------------------------------MONO METHODS:
 	
 	void Start()
 	{
+		startLevel = 0;
+		advancedMode = false;
 		unclickAllButtons();	
+		advanced = advanced_unclicked;
 		GUI.enabled = true;
 	}
 	
 	void OnGUI()
 	{	
-		
 		GUI.skin = guiSkin;
 				
-		Vector3 tl = MyCamera.Instance.camera.WorldToScreenPoint(levelTL);
-		Vector3 br = MyCamera.Instance.camera.WorldToScreenPoint(levelBR);
+		Vector3 tl = OnlyCamera.Instance.camera.WorldToScreenPoint(levelTL);
+		Vector3 br = OnlyCamera.Instance.camera.WorldToScreenPoint(levelBR);
 		float width = br.x - tl.x;
 		float height = tl.y - br.y;
 		
 		if (GUI.Button (new Rect(tl.x, tl.y, width, height), lvl0))
 		{
-			Debug.Log("LevelSelector --- CLICKED!");
 			unclickAllButtons();
 			lvl0 = lvl0_clicked;
 			startLevel = 0;
@@ -126,8 +131,8 @@ public class LevelSelector : Singleton<LevelSelector> {
 			startLevel = 9;
 		}	 	
 
-		tl = MyCamera.Instance.camera.WorldToScreenPoint(startTL);
-		br = MyCamera.Instance.camera.WorldToScreenPoint(startBR);
+		tl = OnlyCamera.Instance.camera.WorldToScreenPoint(startTL);
+		br = OnlyCamera.Instance.camera.WorldToScreenPoint(startBR);
 		width = br.x - tl.x;
 		height = tl.y - br.y;
 
@@ -137,9 +142,44 @@ public class LevelSelector : Singleton<LevelSelector> {
 			StartCoroutine( StartGame() ) ;
 		}
 
+		tl = OnlyCamera.Instance.camera.WorldToScreenPoint(advancedTL);
+		br = OnlyCamera.Instance.camera.WorldToScreenPoint(advancedBR);
+		width = br.x - tl.x;
+		height = tl.y - br.y;
+		
+		if (GUI.Button (new Rect(tl.x, tl.y, width, height), advanced))
+		{
+			toggleAdvancedMode();
+		}
+
 	}
 	
 //-----------------------------------------------------------------------MY METHODS:
+	
+	IEnumerator StartGame()
+	{
+		// Wait a sec so we can see the start button clicked
+		yield return new WaitForSeconds(0.3f);
+		// Start a new game
+		GameManager.Instance.goToGame(startLevel, advancedMode);
+		// Unclick the buttons so they're ready when we get back
+		unclickAllButtons();
+		// Disable so buttons disappear
+		enabled = false; 
+	}
+	
+	private void toggleAdvancedMode()
+	{
+		if (advancedMode)
+		{
+			advanced = advanced_unclicked;
+		}
+		else
+		{
+			advanced = advanced_clicked;	
+		}
+		advancedMode = ! advancedMode;		
+	}
 	
 	/*
 	 * Sets all levels to unclicked states
@@ -157,17 +197,5 @@ public class LevelSelector : Singleton<LevelSelector> {
 		lvl8 = lvl8_unclicked;
 		lvl9 = lvl9_unclicked;
 		start = start_unclicked;
-	}
-
-	IEnumerator StartGame()
-	{
-		// Wait a sec so we can see the start button clicked
-		yield return new WaitForSeconds(0.3f);
-		// Start a new game
-		Game.Instance.startNewGame(startLevel);
-		// Unclick the buttons so they're ready when we get back
-		unclickAllButtons();
-		// Disable so buttons disappear
-		enabled = false; 
 	}
 }

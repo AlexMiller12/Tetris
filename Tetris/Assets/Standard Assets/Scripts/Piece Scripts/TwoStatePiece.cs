@@ -33,6 +33,7 @@ public class TwoStatePiece : Piece {
 		transform.Translate(new Vector3(0, -1, 0), Space.World);
 		// Toggle flipped status
 		isFlipped = ! isFlipped;
+		AudioManager.Instance.rotate();
 	}
 	
 	

@@ -3,13 +3,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/*
+ TODO:	
+ 	-Check for lateral intersections with Gold Block
+ */
 public class Terrain : Singleton<Terrain> {
 
 //---------------------------------------------------------------------------FIELDS:
 	
 	private Transform[,] blocks;
 	private int gridWidth, gridHeight;
+	private GameObject goldBlock; 
 		
+//---------------------------------------------------------------------MONO METHODS:
+	
+	void Start()
+	{
+		goldBlock = null;	
+	}
+	
 //--------------------------------------------------------------------------METHODS:
  	
    /*
@@ -60,23 +72,15 @@ public class Terrain : Singleton<Terrain> {
 
 		foreach (Transform child in transform)
 		{
-			// Get the col and row of the block
-			int col = Mathf.RoundToInt(child.position.x);
+			// Get the row of the block
 			int row = Mathf.RoundToInt(child.position.z);
-			
-			// Put block on to-destroy list
+			// Put block on to-destroy list if it's on death row (yuk yuk)
 			if (rowNumbers.Contains(row))
 			{
-				// Old square is unoccupied unless something falls on it
-				blocks[col, row] = null;
 				blocksToDestroy.Add(child);
 			}
 		}
-		if (blocksToDestroy.Count != rowNumbers.Count * 10) //TEMP
-		{
-			Debug.Log("Terrain --- ERROR 3");
-		}
-		// Destroy all blocks
+		// Destroy all blocks on the hit list
 		for (int i = 0; i < blocksToDestroy.Count; i++) 
 		{
 			Destroy(blocksToDestroy[i].gameObject);
@@ -100,6 +104,7 @@ public class Terrain : Singleton<Terrain> {
 				}
 			}
 		}
+		destroyGoldBlock();
 	}
 	
 	/*
@@ -118,6 +123,7 @@ public class Terrain : Singleton<Terrain> {
 			{
 				if (blockRow > row)
 				{
+					// Lower each block one square for each row cleared beneath it
 					toLower++;
 				}
 			}
@@ -126,7 +132,7 @@ public class Terrain : Singleton<Terrain> {
 				block.Translate(new Vector3(0, 0, -toLower), Space.World);
 			}
 		}
-		// Update grid
+		// Update block positions on grid
 		resetGrid (gridWidth, gridHeight);
 	}
 	
@@ -185,7 +191,6 @@ public class Terrain : Singleton<Terrain> {
 		gridWidth = width;
 		gridHeight = height;
 		blocks = new Transform[width, height];
-		
 		// Populate it with fallen blocks (if they exist)
 		foreach (Transform block in transform)
 		{
@@ -199,8 +204,146 @@ public class Terrain : Singleton<Terrain> {
 			catch (Exception e)
 			{
 				Debug.Log("col, row " + col + ", " + row + " is no good!");	
+				Debug.Log("Caught Exception: \n" + e.ToString());
 			}
 		}
 	}
+	
+//-------------------------------------------------------------GOLDEN BLOCK METHODS:
+	
+	/*
+	 * Destroys the gold block if it exists
+	 */
+	private void destroyGoldBlock()
+	{
+		if (goldBlock != null)
+		{
+			GameObject.Destroy(goldBlock);	
+		}
+	}
+	
+	/*
+	 * Returns the highest row that has a block in it
+	 */
+	public int getHighestBlockRow()
+	{
+		// Start at top and work down
+		for (int row = gridHeight - 1; row > 0; row--)
+		{
+			for (int col = 0; col < gridWidth; col++)
+			{
+				if (blocks[col, row] != null)
+				{
+					return row;	
+				}
+			}
+		}
+		// If we didn't find anything, return lowest row
+		return 0;
+	}
 
+	/*
+	 * Returns true if there's a golden block in terrain
+	 */
+	public bool hasGoldBlock()
+	{
+		return goldBlock != null;
+	}
+	
+	/*
+	 * Returns true if the piece occupies the space right above the golden block
+	 */
+	public bool willFallOnGoldBlock(Piece piece)
+	{
+		if (goldBlock == null)
+		{
+			return false;	
+		}
+		// Get grid location of golden block
+		int goldCol = Mathf.RoundToInt(goldBlock.transform.position.x);
+		int goldRow = Mathf.RoundToInt(goldBlock.transform.position.z);
+		
+		foreach (Transform block in piece.transform)
+		{
+			// Find grid location of each block
+			int col = Mathf.RoundToInt(block.position.x);
+			int row = Mathf.RoundToInt(block.position.z);
+			// See if it occupies spot above Golden Block
+			if (col == goldCol && row == (goldRow + 1))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/*
+	 * Returns true if the piece will move into Gold Block
+	 */
+	public bool willMoveIntoGoldBlock(Piece piece, int xMovement)
+	{
+		if (goldBlock == null)
+		{
+			return false;	
+		}
+		// Get grid location of golden block
+		int goldCol = Mathf.RoundToInt(goldBlock.transform.position.x);
+		int goldRow = Mathf.RoundToInt(goldBlock.transform.position.z);
+		
+		foreach (Transform block in piece.transform)
+		{
+			// Find grid location of each block
+			int col = Mathf.RoundToInt(block.position.x);
+			int row = Mathf.RoundToInt(block.position.z);
+			// See if it occupies spot next to GB
+			if (col == (goldCol - xMovement) && row == goldRow)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/*
+	 * Merges piece with gold block
+	 */
+	public void mergeWithGoldBlock(Piece piece)
+	{
+		// Give the gold block a new parent
+		goldBlock.transform.parent = piece.transform;
+		goldBlock = null;
+		AudioManager.Instance.merge();
+	}
+	
+	/*
+	 * Returns true if the piece occupies the space right above the golden block
+	 */
+	private bool overlapsGoldBlock(Piece piece)
+	{
+		return false;
+		// Get grid location of golden block
+		int goldCol = Mathf.RoundToInt(goldBlock.transform.position.x);
+		int goldRow = Mathf.RoundToInt(goldBlock.transform.position.z);
+		
+		foreach (Transform block in piece.transform)
+		{
+			// Find grid location of each block
+			int col = Mathf.RoundToInt(block.position.x);
+			int row = Mathf.RoundToInt(block.position.z);
+			// See if it occupies spot above Golden Block
+			if (col == goldCol && row == goldRow)
+			{
+				return true;
+			}
+		}
+		return false;		
+	}
+		
+	/*
+	 * Sets the current goldBlock
+	 */
+	public void setGoldBlock(GameObject block)
+	{
+		goldBlock = block;
+	}
 }
